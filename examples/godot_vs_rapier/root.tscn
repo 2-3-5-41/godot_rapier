@@ -13,6 +13,7 @@ sky_material = SubResource("PhysicalSkyMaterial_ctbse")
 background_mode = 2
 sky = SubResource("Sky_54c6w")
 tonemap_mode = 2
+glow_enabled = true
 
 [sub_resource type="ViewportTexture" id="ViewportTexture_16unc"]
 viewport_path = NodePath("RapierPhysics")
@@ -34,8 +35,8 @@ use_debanding = true
 size = Vector2i(1024, 1024)
 
 [node name="Camera3D" type="Camera3D" parent="GodotPhysics"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 2, 8)
-fov = 45.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 8)
+fov = 40.0
 
 [node name="GodotWorld" parent="GodotPhysics" instance=ExtResource("2_so8uk")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
@@ -45,8 +46,8 @@ use_debanding = true
 size = Vector2i(1024, 1024)
 
 [node name="Camera3D" type="Camera3D" parent="RapierPhysics"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 2, 8)
-fov = 45.0
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, 8)
+fov = 40.0
 
 [node name="RapierWorld3D" parent="RapierPhysics" instance=ExtResource("2_7mibe")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)

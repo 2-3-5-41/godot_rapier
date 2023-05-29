@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://diw4cr542o2e6"]
+[gd_scene load_steps=6 format=3 uid="uid://diw4cr542o2e6"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_slrby"]
 size = Vector3(10, 1, 10)
@@ -9,6 +9,9 @@ size = Vector3(10, 1, 10)
 [sub_resource type="BoxShape3D" id="BoxShape3D_fyqfq"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_tacfc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2lksm"]
+albedo_color = Color(1, 0.745098, 0, 1)
 
 [node name="GodotWorld" type="Node3D"]
 
@@ -28,16 +31,19 @@ transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, 
 shape = SubResource("BoxShape3D_fyqfq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+gi_mode = 2
 mesh = SubResource("BoxMesh_tacfc")
 
 [node name="RigidBody3D2" type="RigidBody3D" parent="."]
-transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 0.1, 2, 0)
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, 0.1, 2.5, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D2"]
 shape = SubResource("BoxShape3D_fyqfq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D2"]
+gi_mode = 2
 mesh = SubResource("BoxMesh_tacfc")
+surface_material_override/0 = SubResource("StandardMaterial3D_2lksm")
 
 [node name="RigidBody3D3" type="RigidBody3D" parent="."]
 transform = Transform3D(0.984808, 0, -0.173648, 0, 1, 0, 0.173648, 0, 0.984808, -0.15, 4, 0)
@@ -46,6 +52,7 @@ transform = Transform3D(0.984808, 0, -0.173648, 0, 1, 0, 0.173648, 0, 0.984808, 
 shape = SubResource("BoxShape3D_fyqfq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D3"]
+gi_mode = 2
 mesh = SubResource("BoxMesh_tacfc")
 
 [node name="RigidBody3D4" type="RigidBody3D" parent="."]
@@ -55,4 +62,5 @@ transform = Transform3D(0.589069, 0.797059, -0.133022, -0.663414, 0.383022, -0.6
 shape = SubResource("BoxShape3D_fyqfq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D4"]
+gi_mode = 2
 mesh = SubResource("BoxMesh_tacfc")

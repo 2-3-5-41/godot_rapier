@@ -103,7 +103,7 @@ impl NodeVirtual for RapierWorld3D {
         );
     }
 
-    fn process(&mut self, _delta: f64) {
+    fn physics_process(&mut self, _delta: f64) {
         if Engine::singleton().is_editor_hint() {
             return;
         }
