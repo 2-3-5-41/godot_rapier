@@ -420,30 +420,26 @@ impl Node3DVirtual for RapierCapsuleCollider3D {
         if let Some(descriptor) = &self.descriptor {
             let description = descriptor.bind();
 
+            let builder: Option<ColliderBuilder>;
+
             if self.axis == 0 {
-                collider = Some(
-                    ColliderBuilder::capsule_x(self.height, self.radius)
-                        .restitution(description.restitution)
-                        .density(description.density)
-                        .friction(description.friction)
-                        .sensor(description.sensor),
-                );
+                builder = Some(ColliderBuilder::capsule_x(self.height, self.radius));
             } else if self.axis == 1 {
-                collider = Some(
-                    ColliderBuilder::capsule_y(self.height, self.radius)
-                        .restitution(description.restitution)
-                        .density(description.density)
-                        .friction(description.friction)
-                        .sensor(description.sensor),
-                );
+                builder = Some(ColliderBuilder::capsule_y(self.height, self.radius));
             } else if self.axis == 2 {
+                builder = Some(ColliderBuilder::capsule_z(self.height, self.radius));
+            } else {
+                builder = None;
+            }
+
+            if let Some(new_collider) = builder {
                 collider = Some(
-                    ColliderBuilder::capsule_z(self.height, self.radius)
+                    new_collider
                         .restitution(description.restitution)
                         .density(description.density)
                         .friction(description.friction)
                         .sensor(description.sensor),
-                );
+                )
             } else {
                 collider = None;
             }
