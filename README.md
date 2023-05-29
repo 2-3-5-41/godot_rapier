@@ -4,6 +4,6 @@ This is another attempt at working with [gdext](https://github.com/godot-rust/gd
 
 ## Examples _(demos)_
 
+https://github.com/2-3-5-41/godot_rapier/assets/93025618/65a2c62e-5544-4fe5-8b13-697f85576e98
 
-https://github.com/2-3-5-41/godot_rapier/assets/93025618/8fef70a0-6bc6-4a08-923a-e87746da8a44
 
