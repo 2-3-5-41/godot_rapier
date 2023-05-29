@@ -1,0 +1,87 @@
+[gd_scene load_steps=10 format=3 uid="uid://diw4cr542o2e6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_slrby"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_5xq1h"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fyqfq"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_tacfc"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2lksm"]
+albedo_color = Color(1, 0.745098, 0, 1)
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_finva"]
+
+[sub_resource type="SphereMesh" id="SphereMesh_bshua"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_2qpp5"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_lhcu6"]
+
+[node name="GodotWorld" type="Node3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 4, 10)
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_slrby")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_5xq1h")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, -2, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+shape = SubResource("BoxShape3D_fyqfq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+gi_mode = 2
+mesh = SubResource("BoxMesh_tacfc")
+
+[node name="RigidBody3D2" type="RigidBody3D" parent="."]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -2, 2.5, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D2"]
+shape = SubResource("BoxShape3D_fyqfq")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D2"]
+gi_mode = 2
+mesh = SubResource("BoxMesh_tacfc")
+surface_material_override/0 = SubResource("StandardMaterial3D_2lksm")
+
+[node name="RigidBody3D4" type="RigidBody3D" parent="."]
+transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, 0, 3, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D4"]
+shape = SubResource("SphereShape3D_finva")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D4"]
+gi_mode = 2
+mesh = SubResource("SphereMesh_bshua")
+
+[node name="RigidBody3D5" type="RigidBody3D" parent="."]
+transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, 0, 1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D5"]
+shape = SubResource("SphereShape3D_finva")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D5"]
+gi_mode = 2
+mesh = SubResource("SphereMesh_bshua")
+
+[node name="RigidBody3D6" type="RigidBody3D" parent="."]
+transform = Transform3D(0.984808, -0.173648, 0, 0.173648, 0.984808, 0, 0, 0, 1, 2, 2, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D6"]
+shape = SubResource("CapsuleShape3D_2qpp5")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D6"]
+gi_mode = 2
+mesh = SubResource("CapsuleMesh_lhcu6")

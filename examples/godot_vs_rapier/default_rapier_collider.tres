@@ -1,0 +1,4 @@
+[gd_resource type="RapierColliderDescriptor" format=3 uid="uid://c2tidbrydqcmn"]
+
+[resource]
+restitution = 0.7

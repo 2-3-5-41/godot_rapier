@@ -1,71 +1,12 @@
+use crate::rapier_collider_descriptor::RapierColliderDescriptor;
+use crate::rapier_physics_world::{RapierPhysicsWorld, RapierSingletonAccess};
 use godot::engine::Engine;
 use godot::prelude::*;
-use rapier3d::dynamics::{
-    CCDSolver, ImpulseJointSet, IntegrationParameters, IslandManager, MultibodyJointSet,
-    RigidBodySet,
-};
-use rapier3d::geometry::{BroadPhase, ColliderSet, NarrowPhase};
 use rapier3d::na;
-use rapier3d::pipeline::PhysicsPipeline;
-use rapier3d::prelude::{Collider, ColliderBuilder, Isometry, RigidBodyBuilder, RigidBodyHandle};
+use rapier3d::prelude::{
+    ColliderBuilder, ColliderHandle, Isometry, RigidBodyBuilder, RigidBodyHandle,
+};
 use std::cell::RefCell;
-
-pub struct RapierPhysicsWorld {
-    physics_pipeline: PhysicsPipeline,
-    integration_params: IntegrationParameters,
-    island_manager: IslandManager,
-    broad_phase: BroadPhase,
-    narrow_phase: NarrowPhase,
-    rigid_body_set: RigidBodySet,
-    collider_set: ColliderSet,
-    impulse_joint_set: ImpulseJointSet,
-    multibody_joint_set: MultibodyJointSet,
-    ccd_solver: CCDSolver,
-}
-
-impl RapierPhysicsWorld {
-    pub fn new() -> Self {
-        Self {
-            physics_pipeline: PhysicsPipeline::new(),
-            integration_params: IntegrationParameters::default(),
-            island_manager: IslandManager::new(),
-            broad_phase: BroadPhase::new(),
-            narrow_phase: NarrowPhase::new(),
-            rigid_body_set: RigidBodySet::new(),
-            collider_set: ColliderSet::new(),
-            impulse_joint_set: ImpulseJointSet::new(),
-            multibody_joint_set: MultibodyJointSet::new(),
-            ccd_solver: CCDSolver::new(),
-        }
-    }
-
-    pub fn step(&mut self, gravity: Vector3) {
-        let gravity = na::Vector3::new(gravity.x, gravity.y, gravity.z);
-        let physics_hook = ();
-        let event_handler = ();
-
-        self.physics_pipeline.step(
-            &gravity,
-            &self.integration_params,
-            &mut self.island_manager,
-            &mut self.broad_phase,
-            &mut self.narrow_phase,
-            &mut self.rigid_body_set,
-            &mut self.collider_set,
-            &mut self.impulse_joint_set,
-            &mut self.multibody_joint_set,
-            &mut self.ccd_solver,
-            None,
-            &physics_hook,
-            &event_handler,
-        )
-    }
-
-    pub fn insert_rigid_body_collider(&mut self, collider: Collider, body: RigidBodyHandle) {
-        self.collider_set
-            .insert_with_parent(collider, body, &mut self.rigid_body_set);
-    }
-}
 
 #[derive(GodotClass)]
 #[class(base=Node3D)]
@@ -115,25 +56,6 @@ impl NodeVirtual for RapierWorld3D {
 
 #[godot_api]
 impl RapierWorld3D {}
-
-pub trait RapierSingletonAccess {
-    fn get_rapier_instance(&self) -> Option<Gd<RapierWorld3D>> {
-        let rapier_singleton = Engine::singleton().get_singleton(StringName::from("RapierWorld3D"));
-
-        let rapier_instance: Option<Gd<RapierWorld3D>>;
-
-        match rapier_singleton {
-            Some(instance) => match instance.try_cast::<RapierWorld3D>() {
-                Some(rapier) => rapier_instance = Some(rapier),
-                None => rapier_instance = None,
-            },
-
-            None => rapier_instance = None,
-        };
-
-        return rapier_instance;
-    }
-}
 
 #[derive(GodotClass)]
 #[class(base=Node3D)]
@@ -193,7 +115,7 @@ impl Node3DVirtual for RapierRigidBody3D {
             return;
         }
 
-        self.rapier_instance = self.get_rapier_instance();
+        self.rapier_instance = self.get_rapier3d_instance();
 
         let mut world: Option<GdRef<RapierWorld3D>> = None;
         if let Some(rapier_world) = &self.rapier_instance {
@@ -233,14 +155,6 @@ impl Node3DVirtual for RapierRigidBody3D {
             if let Some(world) = world {
                 let handle = world.rapier.borrow_mut().rigid_body_set.insert(build);
                 self.rigid_body_handle = Some(handle);
-
-                // Test collider, please remove later.
-                // world.rapier.borrow_mut().insert_rigid_body_collider(
-                //     ColliderBuilder::cuboid(0.5, 0.5, 0.5)
-                //         .restitution(0.3)
-                //         .build(),
-                //     handle,
-                // );
             }
         }
     }
@@ -258,7 +172,7 @@ impl Node3DVirtual for RapierRigidBody3D {
         if let Some(world) = world {
             let bodies = &world.rapier.borrow().rigid_body_set;
             let rapier_body = bodies.get(self.rigid_body_handle.unwrap()).unwrap();
-            let body_pos = &mut rapier_body.position();
+            let body_pos = &rapier_body.position();
 
             self.base.set_global_position(Vector3::new(
                 body_pos.translation.x,
@@ -285,7 +199,7 @@ impl RapierSingletonAccess for RapierRigidBody3D {}
 #[derive(GodotClass)]
 #[class(base=Node3D)]
 pub struct RapierCuboidCollider3D {
-    collider: Option<Collider>,
+    collider: Option<ColliderHandle>,
 
     #[export]
     descriptor: Option<Gd<RapierColliderDescriptor>>,
@@ -317,7 +231,7 @@ impl Node3DVirtual for RapierCuboidCollider3D {
             return;
         }
 
-        let world = self.get_rapier_instance().unwrap();
+        let world = self.get_rapier3d_instance().unwrap();
         let world = world.bind();
 
         let mut rapier = world.rapier.borrow_mut();
@@ -339,66 +253,227 @@ impl Node3DVirtual for RapierCuboidCollider3D {
             Some(parent) => {
                 let parent = parent.bind();
 
-                rapier.insert_rigid_body_collider(
+                self.collider = Some(rapier.insert_rigid_body_collider(
                     collider.expect("No collider to insert!").build(),
                     parent.rigid_body_handle.unwrap(),
-                );
+                ));
             }
             None => {
                 let start_pos = self.base.get_global_position();
                 let start_rot = self.base.get_global_rotation();
 
-                let isolated_collider = collider.expect("No collider!").position(
-                    Isometry::new(
-                        na::Vector3::new(start_pos.x, start_pos.y, start_pos.z),
-                        na::Vector3::new(start_rot.x, start_rot.y, start_rot.z)
-                    )
-                );
+                let isolated_collider = collider.expect("No collider!").position(Isometry::new(
+                    na::Vector3::new(start_pos.x, start_pos.y, start_pos.z),
+                    na::Vector3::new(start_rot.x, start_rot.y, start_rot.z),
+                ));
 
-                rapier
-                    .collider_set
-                    .insert(isolated_collider.build());
+                self.collider = Some(rapier.collider_set.insert(isolated_collider.build()));
             }
         }
     }
 }
 
-impl RapierSingletonAccess for RapierCuboidCollider3D {}
-
 #[godot_api]
 impl RapierCuboidCollider3D {}
 
+impl RapierSingletonAccess for RapierCuboidCollider3D {}
+
 #[derive(GodotClass)]
-#[class(base=Resource)]
-pub struct RapierColliderDescriptor {
-    #[export]
-    restitution: real,
+#[class(base=Node3D)]
+pub struct RapierBallCollider3D {
+    collider: Option<ColliderHandle>,
 
     #[export]
-    density: real,
+    descriptor: Option<Gd<RapierColliderDescriptor>>,
 
     #[export]
-    friction: real,
+    rigid_body_parent: Option<Gd<RapierRigidBody3D>>,
 
     #[export]
-    sensor: bool,
+    radius: real,
 
     #[base]
-    base: Base<Resource>,
+    base: Base<Node3D>,
 }
 
 #[godot_api]
-impl ResourceVirtual for RapierColliderDescriptor {
-    fn init(base: Base<Self::Base>) -> Self {
+impl Node3DVirtual for RapierBallCollider3D {
+    fn init(base: Base<Node3D>) -> Self {
         Self {
-            restitution: 0.2,
-            density: 1.0,
-            friction: 0.5,
-            sensor: false,
+            collider: None,
+            descriptor: None,
+            rigid_body_parent: None,
+            radius: 0.5,
             base,
+        }
+    }
+
+    fn ready(&mut self) {
+        if Engine::singleton().is_editor_hint() {
+            return;
+        }
+
+        let world = self.get_rapier3d_instance().unwrap();
+        let world = world.bind();
+
+        let mut rapier = world.rapier.borrow_mut();
+
+        let mut collider: Option<ColliderBuilder> = None;
+
+        if let Some(descriptor) = &self.descriptor {
+            let description = descriptor.bind();
+            collider = Some(
+                ColliderBuilder::ball(self.radius)
+                    .restitution(description.restitution)
+                    .density(description.density)
+                    .friction(description.friction)
+                    .sensor(description.sensor),
+            );
+        }
+
+        match &self.rigid_body_parent {
+            Some(parent) => {
+                let parent = parent.bind();
+
+                self.collider = Some(rapier.insert_rigid_body_collider(
+                    collider.expect("No collider to insert!").build(),
+                    parent.rigid_body_handle.unwrap(),
+                ));
+            }
+            None => {
+                let start_pos = self.base.get_global_position();
+                let start_rot = self.base.get_global_rotation();
+
+                let isolated_collider = collider.expect("No collider!").position(Isometry::new(
+                    na::Vector3::new(start_pos.x, start_pos.y, start_pos.z),
+                    na::Vector3::new(start_rot.x, start_rot.y, start_rot.z),
+                ));
+
+                self.collider = Some(rapier.collider_set.insert(isolated_collider.build()));
+            }
         }
     }
 }
 
 #[godot_api]
-impl RapierColliderDescriptor {}
+impl RapierBallCollider3D {}
+
+impl RapierSingletonAccess for RapierBallCollider3D {}
+
+#[derive(GodotClass)]
+#[class(base=Node3D)]
+pub struct RapierCapsuleCollider3D {
+    collider: Option<ColliderHandle>,
+
+    #[export]
+    descriptor: Option<Gd<RapierColliderDescriptor>>,
+
+    #[export]
+    rigid_body_parent: Option<Gd<RapierRigidBody3D>>,
+
+    /// The axis in which the capsule collider will align itself.
+    ///
+    /// 0 -> x
+    ///
+    /// 1 -> y
+    ///
+    /// 2 -> z
+    #[export]
+    axis: i8,
+
+    #[export]
+    radius: real,
+
+    #[export]
+    height: real,
+
+    #[base]
+    base: Base<Node3D>,
+}
+
+#[godot_api]
+impl Node3DVirtual for RapierCapsuleCollider3D {
+    fn init(base: Base<Node3D>) -> Self {
+        Self {
+            collider: None,
+            descriptor: None,
+            rigid_body_parent: None,
+            axis: 1,
+            radius: 0.5,
+            height: 0.5,
+            base,
+        }
+    }
+
+    fn ready(&mut self) {
+        if Engine::singleton().is_editor_hint() {
+            return;
+        }
+
+        let world = self.get_rapier3d_instance().unwrap();
+        let world = world.bind();
+
+        let mut rapier = world.rapier.borrow_mut();
+
+        let mut collider: Option<ColliderBuilder> = None;
+
+        if let Some(descriptor) = &self.descriptor {
+            let description = descriptor.bind();
+
+            if self.axis == 0 {
+                collider = Some(
+                    ColliderBuilder::capsule_x(self.height, self.radius)
+                        .restitution(description.restitution)
+                        .density(description.density)
+                        .friction(description.friction)
+                        .sensor(description.sensor),
+                );
+            } else if self.axis == 1 {
+                collider = Some(
+                    ColliderBuilder::capsule_y(self.height, self.radius)
+                        .restitution(description.restitution)
+                        .density(description.density)
+                        .friction(description.friction)
+                        .sensor(description.sensor),
+                );
+            } else if self.axis == 2 {
+                collider = Some(
+                    ColliderBuilder::capsule_z(self.height, self.radius)
+                        .restitution(description.restitution)
+                        .density(description.density)
+                        .friction(description.friction)
+                        .sensor(description.sensor),
+                );
+            } else {
+                collider = None;
+            }
+        }
+
+        match &self.rigid_body_parent {
+            Some(parent) => {
+                let parent = parent.bind();
+
+                self.collider = Some(rapier.insert_rigid_body_collider(
+                    collider.expect("No collider to insert!").build(),
+                    parent.rigid_body_handle.unwrap(),
+                ));
+            }
+            None => {
+                let start_pos = self.base.get_global_position();
+                let start_rot = self.base.get_global_rotation();
+
+                let isolated_collider = collider.expect("No collider!").position(Isometry::new(
+                    na::Vector3::new(start_pos.x, start_pos.y, start_pos.z),
+                    na::Vector3::new(start_rot.x, start_rot.y, start_rot.z),
+                ));
+
+                self.collider = Some(rapier.collider_set.insert(isolated_collider.build()));
+            }
+        }
+    }
+}
+
+#[godot_api]
+impl RapierCapsuleCollider3D {}
+
+impl RapierSingletonAccess for RapierCapsuleCollider3D {}

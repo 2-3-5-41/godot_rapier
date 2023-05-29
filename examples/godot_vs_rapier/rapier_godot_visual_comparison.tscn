@@ -1,8 +1,8 @@
 [gd_scene load_steps=9 format=3 uid="uid://0gttrba1glj7"]
 
-[ext_resource type="PackedScene" uid="uid://7r6m8o378pcm" path="res://rapier_world_3d.tscn" id="2_7mibe"]
-[ext_resource type="PackedScene" uid="uid://diw4cr542o2e6" path="res://godot_world.tscn" id="2_so8uk"]
-[ext_resource type="Script" path="res://fps_label.gd" id="3_obq0l"]
+[ext_resource type="PackedScene" uid="uid://diw4cr542o2e6" path="res://worlds/godot_world.tscn" id="1_vns82"]
+[ext_resource type="PackedScene" uid="uid://7r6m8o378pcm" path="res://worlds/rapier_world_3d.tscn" id="2_whrlk"]
+[ext_resource type="Script" path="res://fps_label.gd" id="3_1ee5p"]
 
 [sub_resource type="PhysicalSkyMaterial" id="PhysicalSkyMaterial_ctbse"]
 
@@ -29,28 +29,21 @@ environment = SubResource("Environment_nyi4s")
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
 transform = Transform3D(0.869228, -0.0849868, 0.487053, -0.494412, -0.149416, 0.85629, 6.77157e-09, -0.985115, -0.171895, 0, 0, 0)
 light_angular_distance = 1.0
+shadow_enabled = true
 
 [node name="GodotPhysics" type="SubViewport" parent="."]
 use_debanding = true
 size = Vector2i(1024, 1024)
 
-[node name="Camera3D" type="Camera3D" parent="GodotPhysics"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 8)
-fov = 40.0
-
-[node name="GodotWorld" parent="GodotPhysics" instance=ExtResource("2_so8uk")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 0)
+[node name="GodotWorld" parent="GodotPhysics" instance=ExtResource("1_vns82")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 50, 0, 0)
 
 [node name="RapierPhysics" type="SubViewport" parent="."]
 use_debanding = true
 size = Vector2i(1024, 1024)
 
-[node name="Camera3D" type="Camera3D" parent="RapierPhysics"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1, 8)
-fov = 40.0
-
-[node name="RapierWorld3D" parent="RapierPhysics" instance=ExtResource("2_7mibe")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0, 0)
+[node name="RapierWorld3D" parent="RapierPhysics" instance=ExtResource("2_whrlk")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -50, 0, 0)
 
 [node name="SplitView" type="Control" parent="."]
 layout_mode = 3
@@ -93,14 +86,12 @@ grow_vertical = 0
 [node name="Label" type="Label" parent="SplitView/Labels"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "Rapier3D"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="SplitView/Labels"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0, 0, 0, 1)
 text = "GodotPhysics"
 horizontal_alignment = 1
 
@@ -130,4 +121,4 @@ text = "FPS"
 
 [node name="Label2" type="Label" parent="SplitView/Panel/HBoxContainer"]
 layout_mode = 2
-script = ExtResource("3_obq0l")
+script = ExtResource("3_1ee5p")

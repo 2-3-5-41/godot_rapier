@@ -1,0 +1,86 @@
+[gd_scene load_steps=8 format=3 uid="uid://7r6m8o378pcm"]
+
+[ext_resource type="RapierColliderDescriptor" uid="uid://c2tidbrydqcmn" path="res://default_rapier_collider.tres" id="1_3rdvq"]
+
+[sub_resource type="RapierColliderDescriptor" id="RapierColliderDescriptor_udho3"]
+restitution = 0.1
+
+[sub_resource type="BoxMesh" id="BoxMesh_fau80"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_b4yaf"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lvt5x"]
+albedo_color = Color(1, 0.745098, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_vag0j"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_q8cec"]
+
+[node name="RapierWorld3D" type="RapierWorld3D"]
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 4, 10)
+
+[node name="RapierCuboidCollider3D" type="RapierCuboidCollider3D" parent="."]
+descriptor = SubResource("RapierColliderDescriptor_udho3")
+dimensions = Vector3(5, 0.5, 5)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RapierCuboidCollider3D"]
+mesh = SubResource("BoxMesh_fau80")
+
+[node name="RapierRigidBody3D2" type="RapierRigidBody3D" parent="."]
+transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, -2, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RapierRigidBody3D2"]
+gi_mode = 2
+mesh = SubResource("BoxMesh_b4yaf")
+
+[node name="RapierCuboidCollider3D" type="RapierCuboidCollider3D" parent="RapierRigidBody3D2" node_paths=PackedStringArray("rigid_body_parent")]
+descriptor = ExtResource("1_3rdvq")
+rigid_body_parent = NodePath("..")
+
+[node name="RapierRigidBody3D3" type="RapierRigidBody3D" parent="."]
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -2, 2.5, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RapierRigidBody3D3"]
+gi_mode = 2
+mesh = SubResource("BoxMesh_b4yaf")
+surface_material_override/0 = SubResource("StandardMaterial3D_lvt5x")
+
+[node name="RapierCuboidCollider3D" type="RapierCuboidCollider3D" parent="RapierRigidBody3D3" node_paths=PackedStringArray("rigid_body_parent")]
+descriptor = ExtResource("1_3rdvq")
+rigid_body_parent = NodePath("..")
+
+[node name="RapierRigidBody3D4" type="RapierRigidBody3D" parent="."]
+transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, 0, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RapierRigidBody3D4"]
+gi_mode = 2
+mesh = SubResource("SphereMesh_vag0j")
+
+[node name="RapierBallCollider3D" type="RapierBallCollider3D" parent="RapierRigidBody3D4" node_paths=PackedStringArray("rigid_body_parent")]
+descriptor = ExtResource("1_3rdvq")
+rigid_body_parent = NodePath("..")
+
+[node name="RapierRigidBody3D5" type="RapierRigidBody3D" parent="."]
+transform = Transform3D(0.961262, 0, 0.275637, 0, 1, 0, -0.275637, 0, 0.961262, 0, 3, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RapierRigidBody3D5"]
+gi_mode = 2
+mesh = SubResource("SphereMesh_vag0j")
+
+[node name="RapierBallCollider3D" type="RapierBallCollider3D" parent="RapierRigidBody3D5" node_paths=PackedStringArray("rigid_body_parent")]
+descriptor = ExtResource("1_3rdvq")
+rigid_body_parent = NodePath("..")
+
+[node name="RapierRigidBody3D" type="RapierRigidBody3D" parent="."]
+transform = Transform3D(0.984808, -0.173648, 0, 0.173648, 0.984808, 0, 0, 0, 1, 2, 2, 0)
+
+[node name="RapierCapsuleCollider3D" type="RapierCapsuleCollider3D" parent="RapierRigidBody3D" node_paths=PackedStringArray("rigid_body_parent")]
+descriptor = ExtResource("1_3rdvq")
+rigid_body_parent = NodePath("..")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RapierRigidBody3D"]
+mesh = SubResource("CapsuleMesh_q8cec")
