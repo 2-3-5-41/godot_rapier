@@ -1,0 +1,12 @@
+[configuration]
+entry_symbol = "gdext_rust_init"
+
+[libraries]
+linux.debug.x86_64 = "res://../../target/debug/libgodot_rapier.so"
+linux.release.x86_64 = "res://../../target/release/libgodot_rapier.so"
+windows.debug.x86_64 = "res://../../target/debug/{my-ext}.dll"
+windows.release.x86_64 = "res://../../target/release/{my-ext}.dll"
+macos.debug = "res://../../target/debug/{my-ext}.dylib"
+macos.release = "res://../../target/release/{my-ext}.dylib"
+macos.debug.arm64 = "res://../../target/debug/{my-ext}.dylib"
+macos.release.arm64 = "res://../../target/release/{my-ext}.dylib"

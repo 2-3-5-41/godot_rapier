@@ -1,0 +1,16 @@
+[package]
+name = "godot_rapier"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[dependencies]
+godot = { git = "https://github.com/godot-rust/gdext", branch = "master" }
+rapier3d = "0.17.2"
+
+[profile.dev.package.rapier3d]
+opt-level = 3
